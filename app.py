@@ -2,6 +2,7 @@ import connexion
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import datetime
+import json
 
 
 # endpoints
@@ -31,7 +32,7 @@ def create_product_rent(product_rent_body):
     db.session.add(product)
     db.session.commit()
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def edit_product_buy(id, product_buy_body):
@@ -50,7 +51,7 @@ def edit_product_buy(id, product_buy_body):
 
     db.session.commit()
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def edit_product_rent(id, product_rent_body):
@@ -69,7 +70,7 @@ def edit_product_rent(id, product_rent_body):
 
     db.session.commit()
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def delete_product_buy(id):
@@ -80,7 +81,7 @@ def delete_product_buy(id):
 
     db.session.delete(product)
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def delete_product_rent(id):
@@ -91,7 +92,7 @@ def delete_product_rent(id):
 
     db.session.delete(product)
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def set_product_buy_discount(id, discount_percentage, valid_until):
@@ -105,7 +106,7 @@ def set_product_buy_discount(id, discount_percentage, valid_until):
 
     db.session.commit()
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def set_product_rent_discount(id, discount_percentage, valid_until):
@@ -119,7 +120,7 @@ def set_product_rent_discount(id, discount_percentage, valid_until):
 
     db.session.commit()
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def get_product_buy(id):
@@ -128,7 +129,7 @@ def get_product_buy(id):
     if not product:
         return {'error': '{} not found'.format(id)}, 404
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def get_product_rent(id):
@@ -137,17 +138,31 @@ def get_product_rent(id):
     if not product:
         return {'error': '{} not found'.format(id)}, 404
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
-def get_all_products_buy(id):
+def get_all_products_buy():
     products = db.Session.query(ProductBuy).all()
-    return products
+    itemsList = []
+    for product in products:
+        itemsList.append(product)
+
+    jsonOut = json.dumps(itemsList)
+
+    return jsonOut
 
 
-def get_all_products_rent(id):
+def get_all_products_rent():
     products = db.Session.query(ProductRent).all()
-    return products
+    itemsList = []
+
+    for product in products:
+        itemsList.append(product)
+
+    jsonOut = json.dumps(itemsList)
+
+
+    return jsonOut;
 
 
 # Do tuka ----------------------------------------------------------------------

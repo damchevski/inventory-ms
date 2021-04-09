@@ -27,15 +27,161 @@ paths:
 
   #TODO
   #create product rent
+  /create/product_rent:
+    post:
+      tags: [ ProductRent ]
+      operationId: app.create_product_rent
+      parameters:
+        - $ref: '#/parameters/product_rent_body'
+      responses:
+        200:
+          description: Product created
+        409:
+          description: Product already exists
+
+
+
   #edit product buy
+  /edit/product_buy/{product_id}:
+    post:
+      tags: [ ProductBuy ]
+      operationId: app.edit_product_buy
+      parameters:
+        - $ref: '#/parameters/product_buy_body'
+        - $ref: '#/parameters/product_id'
+      responses:
+        200:
+          description: Product edited
+        409:
+          description: Product already edited
+
+
   #edit product rent
+  /edit/product_rent/{product_id}:
+    post:
+      tags: [ ProductRent ]
+      operationId: app.edit_product_rent
+      parameters:
+        - $ref: '#/parameters/product_rent_body'
+        - $ref: '#/parameters/product_id'
+      responses:
+        200:
+          description: Product edited
+        409:
+          description: Product already edited
+
+
   #delete product buy
+  /delete/product_buy/{product_id}:
+    post:
+      tags: [ ProductBuy ]
+      operationId: app.delete_product_buy
+      parameters:
+        - $ref: '#/parameters/product_buy_body'
+        - $ref: '#/parameters/product_id'
+      responses:
+        200:
+          description: Product deleted
+        409:
+          description: Product already deleted
+
   #delete product rent
+  /delete/product_rent/{product_id}:
+    post:
+      tags: [ ProductBuy ]
+      operationId: app.delete_product_rent
+      parameters:
+        - $ref: '#/parameters/product_rent_body'
+        - $ref: '#/parameters/product_id'
+      responses:
+        200:
+          description: Product deleted
+        409:
+          description: Product already deleted
+
   #set product buy discount
+  /set/product_buy_discount/{product_id}/{discount_percentage}:
+    post:
+      tags: [ ProductBuy ]
+      operationId: app.set_product_buy_discount
+      parameters:
+        - $ref: '#/parameters/product_buy_body'
+        - $ref: '#/parameters/product_id'
+        - $ref: '#/parameters/discount_percentage'
+      responses:
+        200:
+          description: Product discount set
+        409:
+          description: Product discount already set
   #set product rent discount
+  /set/product_rent_discount/{product_id}/{discount_percentage}:
+    post:
+      tags: [ ProductRent ]
+      operationId: app.set_product_rent_discount
+      parameters:
+        - $ref: '#/parameters/product_rent_body'
+        - $ref: '#/parameters/product_id'
+        - $ref: '#/parameters/discount_percentage'
+      responses:
+        200:
+          description: Product discount set
+        409:
+          description: Product discount already set
+
+
   #get product buy
+  /get/product_buy/{product_id}:
+    get:
+      tags: [ ProductBuy ]
+      operationId: app.get_product_buy
+      parameters:
+        - $ref: '#/parameters/product_buy_body'
+        - $ref: '#/parameters/product_id'
+      responses:
+        200:
+          description: Product returned
+        409:
+          description: Product returned already
   #get product rent
+  /get/product_rent/{product_id}:
+    get:
+      tags: [ ProductRent ]
+      operationId: app.get_product_rent
+      parameters:
+        - $ref: '#/parameters/product_rent_body'
+        - $ref: '#/parameters/product_id'
+      responses:
+        200:
+          description: Product returned
+        409:
+          description: Product already returned
+
   #get all products buy
+  /get/all_products_buy:
+    get:
+      tags: [ ProductBuy ]
+      operationId: app.get_all_products_buy
+      parameters:
+        - $ref: '#/parameters/product_buy_body'
+      responses:
+        200:
+          description: Products returned
+        409:
+          description: Products already returned
+
+
+  #get all products rent
+  /get/all_products_rent:
+    get:
+      tags: [ ProductRent ]
+      operationId: app.get_all_products_rent
+      parameters:
+        - $ref: '#/parameters/product_rent_body'
+      responses:
+        200:
+          description: Products returned
+        409:
+          description: Products already returned
 
 
   #search product-buy by name
@@ -181,6 +327,30 @@ parameters:
         quantity:
           type: integer
 
+  product_rent_body:
+    name: product_rent_body
+    decription: Input for Product Rent
+    in: body
+    schema:
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        price:
+          type: integer
+        description:
+          type: string
+        image:
+          type: string
+        category:
+          type: string
+        brand:
+          type: string
+        available:
+          type: boolean
+
+
   reserve_product_buy_body:
     name: reserve_product_buy_body
     description: Input for Reserve Product Buy
@@ -254,4 +424,11 @@ parameters:
     description: Quantity
     in: path
     type: integer
+    required: true
+
+  discount_percentage:
+    name: discount_percentage
+    description: Discount Percentage
+    in: path
+    type: float
     required: true
