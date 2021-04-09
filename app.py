@@ -19,7 +19,6 @@ def create_product_buy(product_buy_body):
     db.session.add(product)
     db.session.commit()
 
-    # TODO: JSON RETURN
     return {'id': product.id, 'name': product.name}
 
 
@@ -157,9 +156,9 @@ def search_product_buy(search_param):
     product = db.session.query(ProductBuy).filter_by(name=search_param).first()
 
     if not product:
-        return {'error': '{} not found'.format(id)}, 404
+        return {'error': '{} not found'.format(search_param)}, 404
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def search_product_rent(search_param):
@@ -168,7 +167,7 @@ def search_product_rent(search_param):
     if not product:
         return {'error': '{} not found'.format(id)}, 404
 
-    return product
+    return {'id': product.id, 'name': product.name}
 
 
 def buy_coupon(id):
@@ -181,81 +180,89 @@ def buy_coupon(id):
 
     db.session.commit()
 
-    return coupon
+    return {'id': coupon.id}
 
 
-def reserve_product_buy(id, quantity, shopping_cart_id):
-    product = db.session.query(ProductBuy).filter_by(id=id).first()
+def reserve_product_buy(reserve_product_buy_body):
+    product = db.session.query(ProductBuy).filter_by(id=reserve_product_buy_body['product_id']).first()
 
     if not product:
-        return {'error': '{} not found'.format(id)}, 404
+        return {'error': '{} not found'.format(reserve_product_buy_body['product_id'])}, 404
 
-    if product.quantity - quantity < 0:
-        return {'error': '{} < 0 quantity'.format(id)}, 500
+    if product.quantity - reserve_product_buy_body['quantity'] < 0:
+        return {'error': '{} > 0 quantity'.format(reserve_product_buy_body['product_id'])}, 500
 
-    product.quantity = product.quantity - quantity
-    reserved_product = ReservedProductBuy(product_id=id, quantity=quantity, shopping_cart_id=shopping_cart_id)
+    product.quantity = product.quantity - reserve_product_buy_body['quantity']
+    reserved_product = ReservedProductBuy(product_id=reserve_product_buy_body['product_id'],
+                                          quantity=reserve_product_buy_body['quantity'],
+                                          shopping_cart_id=reserve_product_buy_body['shopping_cart_id'])
 
     db.session.add(reserved_product)
+    db.session.commit()
 
-    return reserved_product
+    return {'product_id': reserved_product.product_id, 'shopping_cart_id': reserved_product.shopping_cart_id}
 
 
-def reserve_product_rent(id, user_id):
-    product = db.session.query(ProductRent).filter_by(id=id).first()
+def reserve_product_rent(reserve_product_rent_body):
+    product = db.session.query(ProductRent).filter_by(id=reserve_product_rent_body['product_id']).first()
 
     if not product:
-        return {'error': '{} not found'.format(id)}, 404
+        return {'error': '{} not found'.format(reserve_product_rent_body['product_id'])}, 404
 
     if not product.available:
-        return {'error': '{} not available'.format(id)}, 500
+        return {'error': '{} not available'.format(reserve_product_rent_body['product_id'])}, 500
 
     product.available = False
-    reserved_product = ReservedProductBuy(product_id=id, user_id=user_id)
+    reserved_product = ReservedProductBuy(product_id=reserve_product_rent_body['product_id'],
+                                          user_id=reserve_product_rent_body['user_id'])
 
     db.session.add(reserved_product)
+    db.session.commit()
 
-    return reserved_product
+    return {'product_id': reserved_product.product_id, 'user_id': reserved_product.user_id}
 
 
 def buy_product(shopping_cart_id):
-    reserved_product = db.Session.query(ReservedProductBuy).filter_by(shopping_cart_id=shopping_cart_id).first()
+    reserved_product = db.session.query(ReservedProductBuy).filter_by(shopping_cart_id=shopping_cart_id).first()
+
+    db.session.delete(reserved_product)
+    db.session.commit()
+
+    return {'product_id': reserved_product.product_id, 'shopping_cart_id': reserved_product.shopping_cart_id}
+
+
+def rent_product(product_id, user_id):
+    reserved_product = db.session.query(ReservedProductRent).filter_by(user_id=user_id).filter_by(
+        product_id=product_id).first()
 
     db.delete(reserved_product)
     db.session.commit()
 
-    return reserved_product
+    return {'product_id': reserved_product.product_id, 'user_id': reserved_product.user_id}
 
 
-def rent_product(id, user_id):
-    reserved_product = db.Session.query(ReservedProductRent).filter_by(user_id=user_id).filter_by(product_id=id).first()
-
-    db.delete(reserved_product)
-    db.session.commit()
-
-    return reserved_product
-
-
-def get_price_for_product_buy(id):
-    product = db.session.query(ProductBuy).filter_by(id=id).first()
+def get_price_for_product_buy(product_id):
+    product = db.session.query(ProductBuy).filter_by(id=product_id).first()
 
     if not product:
-        return {'error': '{} not found'.format(id)}, 404
+        return {'error': '{} not found'.format(product_id)}, 404
 
-    if product.discountValid > datetime.datetime.now():
-        return product.price - (product.price / 100 * product.discountPercentage)
+    if product.discountValid:
+        if product.discountValid > datetime.datetime.now():
+            return product.price - (product.price / 100 * product.discountPercentage)
 
     return product.price
 
 
-def get_price_for_product_rent(id):
-    product = db.session.query(ProductRent).filter_by(id=id).first()
+def get_price_for_product_rent(product_id):
+    product = db.session.query(ProductRent).filter_by(id=product_id).first()
 
     if not product:
-        return {'error': '{} not found'.format(id)}, 404
+        return {'error': '{} not found'.format(product_id)}, 404
 
-    if product.discountValid > datetime.datetime.now():
-        return product.price - (product.price / 100 * product.discountPercentage)
+    if product.discountValid:
+        if product.discountValid > datetime.datetime.now():
+            return product.price - (product.price / 100 * product.discountPercentage)
 
     return product.price
 

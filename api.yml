@@ -12,6 +12,7 @@ basePath: "/api"
 
 paths:
 
+  #create product buy
   /create/product_buy:
     post:
       tags: [ ProductBuy ]
@@ -24,40 +25,136 @@ paths:
         409:
           description: Product already exists
 
-#  /test1/{test1_id}:
-#    get:
-#      tags: [ Test1 ]
-#      operationId: app.get_test
-#      summary: Testing endpoint
-#      parameters:
-#        - $ref: '#/parameters/test1_id'
-#      responses:
-#        200:
-#          description: Return test1
-#        404:
-#          description: Does not exist
-#  /person/:
-#    post:
-#      tags: [ Person ]
-#      operationId: controllers.test.person_add
-#      parameters:
-#        - $ref: '#/parameters/person_body'
-#      responses:
-#        200:
-#          description: Return status
-#        409:
-#          description: Already exists
-#  /person/{person_name}:
-#    get:
-#      tags: [ Person ]
-#      operationId: controllers.test.person_find
-#      parameters:
-#        - $ref: '#/parameters/person_name'
-#      responses:
-#        200:
-#          description: Return person object
-#        404:
-#          description: Person not found
+  #TODO
+  #create product rent
+  #edit product buy
+  #edit product rent
+  #delete product buy
+  #delete product rent
+  #set product buy discount
+  #set product rent discount
+  #get product buy
+  #get product rent
+  #get all products buy
+
+
+  #search product-buy by name
+  /search_product_buy/{search_param}:
+    get:
+      tags: [ ProductBuy ]
+      operationId: app.search_product_buy
+      parameters:
+        - $ref : '#/parameters/search_param'
+      responses:
+        200:
+          description: Product found
+        404:
+          description: Product not found
+
+  #search product-rent by name
+  /search_product_rent/{search_param}:
+    get:
+      tags: [ ProductRent ]
+      operationId: app.search_product_rent
+      parameters:
+        - $ref: '#/parameters/search_param'
+      responses:
+        200:
+          description: Product found
+        404:
+          description: Product not found
+
+  #buy coupon
+  /buy_coupon/{coupon_id}:
+    get:
+      tags: [ Coupon ]
+      operationId: app.buy_coupon
+      parameters:
+        - $ref: '#parameters/coupon_id'
+      responses:
+        200:
+          description: Done
+        404:
+          description: Coupon not found
+
+  #reserve product_buy
+  /reserve_product_buy:
+    post:
+      tags: [ ReservedProductBuy ]
+      operationId: app.reserve_product_buy
+      parameters:
+        - $ref: '#parameters/reserve_product_buy_body'
+      responses:
+        200:
+          description: Product reserved
+        404:
+          description: Product not found
+        500:
+          description: Not enough
+
+  #reserve product_rent
+  /reserve_product_rent:
+    post:
+      tags: [ ReservedProductRent ]
+      operationId: app.reserve_product_rent
+      parameters:
+        - $ref: '#parameters/reserve_product_rent_body'
+      responses:
+        200:
+          description: Product reserved
+        404:
+          description: Product not found
+        500:
+          description: Not available
+
+  #confirm buy
+  /buy_product/{shopping_cart_id}:
+    get:
+      tags: [ ReservedProductBuy ]
+      operationId: app.buy_product
+      parameters:
+        - $ref: '#parameters/shopping_cart_id'
+      responses:
+        200:
+          description: Done
+
+  #confirm rent
+  /rent_product/{product_id}/{user_id}:
+    get:
+      tags: [ ReservedProductRent ]
+      operationId: app.rent_product
+      parameters:
+        - $ref: '#parameters/product_id'
+        - $ref: '#parameters/user_id'
+      responses:
+        200:
+          description: Done
+
+  #get price for product_buy
+  /get_price_for_product_buy/{product_id}:
+    get:
+      tags: [ ProductBuy ]
+      operationId: app.get_price_for_product_buy
+      parameters:
+        - $ref: '#parameters/product_id'
+      responses:
+        200:
+          description: Product reserved
+        404:
+          description: Product not found
+
+  #get price for product_rent
+  /get_price_for_product_rent/{product_id}:
+    get:
+      tags: [ ProductRent ]
+      operationId: app.get_price_for_product_rent
+      parameters:
+        - $ref: '#parameters/product_id'
+      responses:
+        200:
+          description: Product reserved
+        404:
+          description: Product not found
 
 parameters:
 
@@ -84,30 +181,77 @@ parameters:
         quantity:
           type: integer
 
-#  test1_id:
-#    name: test1_id
-#    description: Test1 unique id
-#    in: path
-#    type: string
-#    required: true
-#    pattern: "^[a-zA-Z0-9-]+$"
-#
-#  person_body:
-#    name: person_body
-#    description: Test1 unique id
-#    in: body
-#    schema:
-#      required:
-#        - name
-#      properties:
-#        name:
-#          type: string
-#        surname:
-#          type: string
-#
-#  person_name:
-#    name: person_name
-#    description: The name of the person we're looking for
-#    in: path
-#    required: true
-#    type: string
+  reserve_product_buy_body:
+    name: reserve_product_buy_body
+    description: Input for Reserve Product Buy
+    in: body
+    schema:
+      required:
+        - product_id
+        - shopping_cart_id
+        - quantity
+      properties:
+        product_id:
+          type: integer
+        shopping_cart_id:
+          type: integer
+        quantity:
+          type: integer
+
+  reserve_product_rent_body:
+    name: reserve_product_rent_body
+    description: Input for Reserve Product Rent
+    in: body
+    schema:
+      required:
+        - product_id
+        - user_id
+      properties:
+        product_id:
+          type: integer
+        user_id:
+          type: integer
+        quantity:
+          type: integer
+
+  search_param:
+    name: search_param
+    description: Search param (product name)
+    in: path
+    type: string
+    required: true
+
+  coupon_id:
+    name: coupon_id
+    description: Coupon ID
+    in: path
+    type: integer
+    required: true
+
+  product_id:
+    name: product_id
+    description: Product ID
+    in: path
+    type: integer
+    required: true
+
+  shopping_cart_id:
+    name: shopping_cart_id
+    description: Shopping Cart ID
+    in: path
+    type: integer
+    required: true
+
+  user_id:
+    name: user_id
+    description: User ID
+    in: path
+    type: integer
+    required: true
+
+  quantity:
+    name: quantity
+    description: Quantity
+    in: path
+    type: integer
+    required: true
