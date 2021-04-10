@@ -12,6 +12,17 @@ basePath: "/api"
 
 paths:
 
+  #create coupon
+  /create/coupon:
+    post:
+      tags: [ Coupon ]
+      operationId: app.create_coupon
+      parameters:
+        - $ref : '#/parameters/coupon_body'
+      responses:
+        200:
+          description: Coupon created
+
   #create product buy
   /create/product_buy:
     post:
@@ -25,7 +36,6 @@ paths:
         409:
           description: Product already exists
 
-  #TODO
   #create product rent
   /create/product_rent:
     post:
@@ -52,8 +62,8 @@ paths:
       responses:
         200:
           description: Product edited
-        409:
-          description: Product already edited
+        404:
+          description: Product not found
 
 
   #edit product rent
@@ -67,8 +77,8 @@ paths:
       responses:
         200:
           description: Product edited
-        409:
-          description: Product already edited
+        404:
+          description: Product not found
 
 
   #delete product buy
@@ -77,56 +87,55 @@ paths:
       tags: [ ProductBuy ]
       operationId: app.delete_product_buy
       parameters:
-        - $ref: '#/parameters/product_buy_body'
         - $ref: '#/parameters/product_id'
       responses:
         200:
           description: Product deleted
-        409:
-          description: Product already deleted
+        404:
+          description: Product not found
 
   #delete product rent
   /delete/product_rent/{product_id}:
     post:
-      tags: [ ProductBuy ]
+      tags: [ ProductRent ]
       operationId: app.delete_product_rent
       parameters:
-        - $ref: '#/parameters/product_rent_body'
         - $ref: '#/parameters/product_id'
       responses:
         200:
           description: Product deleted
-        409:
-          description: Product already deleted
+        404:
+          description: Product not found
 
   #set product buy discount
-  /set/product_buy_discount/{product_id}/{discount_percentage}:
+  /set/product_buy_discount/{product_id}/{discount_percentage}/{valid_until}:
     post:
       tags: [ ProductBuy ]
       operationId: app.set_product_buy_discount
       parameters:
-        - $ref: '#/parameters/product_buy_body'
         - $ref: '#/parameters/product_id'
         - $ref: '#/parameters/discount_percentage'
+        - $ref: '#/parameters/valid_until'
       responses:
         200:
           description: Product discount set
-        409:
-          description: Product discount already set
+        404:
+          description: Product not found
+
   #set product rent discount
-  /set/product_rent_discount/{product_id}/{discount_percentage}:
+  /set/product_rent_discount/{product_id}/{discount_percentage}/{valid_until}:
     post:
       tags: [ ProductRent ]
       operationId: app.set_product_rent_discount
       parameters:
-        - $ref: '#/parameters/product_rent_body'
         - $ref: '#/parameters/product_id'
         - $ref: '#/parameters/discount_percentage'
+        - $ref: '#/parameters/valid_until'
       responses:
         200:
           description: Product discount set
-        409:
-          description: Product discount already set
+        404:
+          description: Product not found
 
 
   #get product buy
@@ -135,39 +144,34 @@ paths:
       tags: [ ProductBuy ]
       operationId: app.get_product_buy
       parameters:
-        - $ref: '#/parameters/product_buy_body'
         - $ref: '#/parameters/product_id'
       responses:
         200:
           description: Product returned
-        409:
-          description: Product returned already
+        404:
+          description: Product not found
+
   #get product rent
   /get/product_rent/{product_id}:
     get:
       tags: [ ProductRent ]
       operationId: app.get_product_rent
       parameters:
-        - $ref: '#/parameters/product_rent_body'
         - $ref: '#/parameters/product_id'
       responses:
         200:
           description: Product returned
-        409:
-          description: Product already returned
+        404:
+          description: Product not found
 
   #get all products buy
   /get/all_products_buy:
     get:
       tags: [ ProductBuy ]
       operationId: app.get_all_products_buy
-      parameters:
-        - $ref: '#/parameters/product_buy_body'
       responses:
         200:
           description: Products returned
-        409:
-          description: Products already returned
 
 
   #get all products rent
@@ -175,13 +179,9 @@ paths:
     get:
       tags: [ ProductRent ]
       operationId: app.get_all_products_rent
-      parameters:
-        - $ref: '#/parameters/product_rent_body'
       responses:
         200:
           description: Products returned
-        409:
-          description: Products already returned
 
 
   #search product-buy by name
@@ -304,6 +304,20 @@ paths:
 
 parameters:
 
+  coupon_body:
+    name: coupon_body
+    description: Input for Coupon
+    in: body
+    schema:
+      required:
+        - type
+        - quantity
+      properties:
+        type:
+          type: string
+        quantity:
+          type: integer
+
   product_buy_body:
     name: product_buy_body
     description: Input for Product Buy
@@ -329,7 +343,7 @@ parameters:
 
   product_rent_body:
     name: product_rent_body
-    decription: Input for Product Rent
+    description: Input for Product Rent
     in: body
     schema:
       required:
@@ -381,8 +395,6 @@ parameters:
           type: integer
         user_id:
           type: integer
-        quantity:
-          type: integer
 
   search_param:
     name: search_param
@@ -430,5 +442,12 @@ parameters:
     name: discount_percentage
     description: Discount Percentage
     in: path
-    type: float
+    type: integer
+    required: true
+
+  valid_until:
+    name: valid_until
+    description: Discount Valid Until
+    in: path
+    type: string
     required: true
