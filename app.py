@@ -28,7 +28,14 @@ def create_product_buy(product_buy_body):
     db.session.add(product)
     db.session.commit()
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'quantity': product.quantity}
 
 
 def create_product_rent(product_rent_body):
@@ -45,7 +52,14 @@ def create_product_rent(product_rent_body):
     db.session.add(product)
     db.session.commit()
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'available': product.available}
 
 
 def edit_product_buy(product_id, product_buy_body):
@@ -64,7 +78,14 @@ def edit_product_buy(product_id, product_buy_body):
 
     db.session.commit()
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'quantity': product.quantity}
 
 
 def edit_product_rent(product_id, product_rent_body):
@@ -83,7 +104,14 @@ def edit_product_rent(product_id, product_rent_body):
 
     db.session.commit()
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'available': product.available}
 
 
 def delete_product_buy(product_id):
@@ -95,7 +123,14 @@ def delete_product_buy(product_id):
     db.session.delete(product)
     db.session.commit()
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'quantity': product.quantity}
 
 
 def delete_product_rent(product_id):
@@ -107,7 +142,14 @@ def delete_product_rent(product_id):
     db.session.delete(product)
     db.session.commit()
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'available': product.available}
 
 
 def set_product_buy_discount(product_id, discount_percentage, valid_until):
@@ -148,7 +190,14 @@ def get_product_buy(product_id):
     if not product:
         return {'error': '{} not found'.format(product_id)}, 404
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'quantity': product.quantity}
 
 
 def get_product_rent(product_id):
@@ -157,7 +206,14 @@ def get_product_rent(product_id):
     if not product:
         return {'error': '{} not found'.format(product_id)}, 404
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'available': product.available}
 
 
 def get_all_products_buy():
@@ -165,7 +221,14 @@ def get_all_products_buy():
     itemsList = []
 
     for product in products:
-        itemsList.append({'product_id': product.id, 'product_name': product.name})
+        itemsList.append({'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'quantity': product.quantity})
 
     return itemsList
 
@@ -175,7 +238,14 @@ def get_all_products_rent():
     itemsList = []
 
     for product in products:
-        itemsList.append({'product_id': product.id, 'product_name': product.name})
+        itemsList.append({'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'available': product.available})
 
     return itemsList
 
@@ -186,7 +256,14 @@ def search_product_buy(search_param):
     if not product:
         return {'error': '{} not found'.format(search_param)}, 404
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'quantity': product.quantity}
 
 
 def search_product_rent(search_param):
@@ -195,7 +272,14 @@ def search_product_rent(search_param):
     if not product:
         return {'error': '{} not found'.format(search_param)}, 404
 
-    return {'id': product.id, 'name': product.name}
+    return {'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category,
+            'brand': product.brand,
+            'available': product.available}
 
 
 def buy_coupon(coupon_id):
