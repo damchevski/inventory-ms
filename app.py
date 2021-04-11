@@ -222,13 +222,13 @@ def get_all_products_buy():
 
     for product in products:
         itemsList.append({'id': product.id,
-            'name': product.name,
-            'price': product.price,
-            'description': product.description,
-            'image': product.image,
-            'category': product.category,
-            'brand': product.brand,
-            'quantity': product.quantity})
+                          'name': product.name,
+                          'price': product.price,
+                          'description': product.description,
+                          'image': product.image,
+                          'category': product.category,
+                          'brand': product.brand,
+                          'quantity': product.quantity})
 
     return itemsList
 
@@ -239,13 +239,13 @@ def get_all_products_rent():
 
     for product in products:
         itemsList.append({'id': product.id,
-            'name': product.name,
-            'price': product.price,
-            'description': product.description,
-            'image': product.image,
-            'category': product.category,
-            'brand': product.brand,
-            'available': product.available})
+                          'name': product.name,
+                          'price': product.price,
+                          'description': product.description,
+                          'image': product.image,
+                          'category': product.category,
+                          'brand': product.brand,
+                          'available': product.available})
 
     return itemsList
 
@@ -348,7 +348,7 @@ def buy_product(shopping_cart_id):
 
 
 def rent_product(product_id, user_id):
-    reserved_product = db.session.query(ReservedProductRent).filter_by(user_id=user_id)\
+    reserved_product = db.session.query(ReservedProductRent).filter_by(user_id=user_id) \
         .filter_by(product_id=product_id).first()
 
     db.session.delete(reserved_product)
@@ -365,9 +365,10 @@ def get_price_for_product_buy(product_id):
 
     if product.discountValid:
         if product.discountValid > datetime.now().date():
-            return product.price - (product.price / 100 * product.discountPercentage)
+            return {'product_name':product.name,
+                    'product_price': product.price - (product.price / 100 * product.discountPercentage)}
 
-    return product.price
+    return {'product_name': product.name, 'product_price': product.price}
 
 
 def get_price_for_product_rent(product_id):
@@ -378,9 +379,10 @@ def get_price_for_product_rent(product_id):
 
     if product.discountValid:
         if product.discountValid > datetime.now().date():
-            return product.price - (product.price / 100 * product.discountPercentage)
+            return {'product_name':product.name,
+                    'product_price': product.price - (product.price / 100 * product.discountPercentage)}
 
-    return product.price
+    return {'product_name': product.name, 'product_price': product.price}
 
 
 # configuration
