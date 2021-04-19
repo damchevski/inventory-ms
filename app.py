@@ -2,17 +2,18 @@ import connexion
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from schemas import *
 
 
 # endpoints
 def create_coupon(coupon_body):
     coupon = Coupon(type=coupon_body['type'], quantity=coupon_body['quantity'])
+    coupon_schema = CouponSchema()
 
     db.session.add(coupon)
     db.session.commit()
 
-    return {'coupon_id': coupon.id, 'type': coupon.type, 'quantity': coupon.quantity}
-
+    return coupon_schema.dump(coupon)
 
 def create_product_buy(product_buy_body):
     product = db.session.query(ProductBuy).filter_by(name=product_buy_body['name']).first()
@@ -404,6 +405,7 @@ def get_all_product_valid_discounts():
                                 'discount_percentage': product.discountPercentage})
 
     return return_list
+
 
 # configuration
 connexion_app = connexion.App(__name__, specification_dir="./")
