@@ -302,6 +302,15 @@ paths:
         404:
           description: Product not found
 
+  #get all products valid discounts
+  /get_all_product_valid_discounts:
+    get:
+      tags: [ ProductBuy, ProductRent ]
+      operationId: app.get_all_product_valid_discounts
+      responses:
+        200:
+          description: Products returned
+
 parameters:
 
   coupon_body:

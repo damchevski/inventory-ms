@@ -365,7 +365,7 @@ def get_price_for_product_buy(product_id):
 
     if product.discountValid:
         if product.discountValid > datetime.now().date():
-            return {'product_name':product.name,
+            return {'product_name': product.name,
                     'product_price': product.price - (product.price / 100 * product.discountPercentage)}
 
     return {'product_name': product.name, 'product_price': product.price}
@@ -379,11 +379,31 @@ def get_price_for_product_rent(product_id):
 
     if product.discountValid:
         if product.discountValid > datetime.now().date():
-            return {'product_name':product.name,
+            return {'product_name': product.name,
                     'product_price': product.price - (product.price / 100 * product.discountPercentage)}
 
     return {'product_name': product.name, 'product_price': product.price}
 
+
+def get_all_product_valid_discounts():
+    products_buy = db.session.query(ProductBuy).all()
+    products_rent = db.session.query(ProductRent).all()
+
+    return_list = []
+
+    for product in products_buy:
+        if product.discountValid is not None:
+            return_list.append({'product_id': product.id, 'product_type': 'buy',
+                                'discount_valid_until': product.discountValid,
+                                'discount_percentage': product.discountPercentage})
+
+    for product in products_rent:
+        if product.discountValid is not None:
+            return_list.append({'product_id': product.id, 'product_type': 'rent',
+                                'discount_valid_until': product.discountValid,
+                                'discount_percentage': product.discountPercentage})
+
+    return return_list
 
 # configuration
 connexion_app = connexion.App(__name__, specification_dir="./")
