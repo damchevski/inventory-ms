@@ -43,8 +43,3 @@ class ReservedProductRent(db.Model):
     product_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
 
-
-class Person(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), nullable=False)
-    surname = db.Column(db.String(100), nullable=True)
