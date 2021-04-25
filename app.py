@@ -3,9 +3,43 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from schemas import *
+import requests
+from flask import request, abort
+from functools import wraps
+import jwt
+
+JWT_SECRET = "MY SECRET"
 
 
-# endpoints
+def decode_token(token):
+    return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+
+def has_role(arg):
+    def has_role_inner(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            try:
+                headers = request.headers
+                if 'AUTHORIZATION' in headers:
+                    token = headers['AUTHORIZATION'].split(' ')[1]
+                    decoded_token = decode_token(token)
+                    if 'admin' in decoded_token['roles']:
+                        return fn(*args, **kwargs)
+                    for role in arg:
+                        if role in decoded_token['roles']:
+                            return fn(*args, **kwargs)
+                    abort(401)
+                return fn(*args, **kwargs)
+            except Exception as e:
+                abort(401)
+
+        return decorated_view
+
+    return has_role_inner
+
+
+@has_role(["admin"])
 def create_coupon(coupon_body):
     coupon = Coupon(type=coupon_body['type'], quantity=coupon_body['quantity'])
     coupon_schema = CouponSchema()
@@ -15,6 +49,8 @@ def create_coupon(coupon_body):
 
     return coupon_schema.dump(coupon)
 
+
+@has_role(["admin"])
 def create_product_buy(product_buy_body):
     product = db.session.query(ProductBuy).filter_by(name=product_buy_body['name']).first()
 
@@ -39,6 +75,7 @@ def create_product_buy(product_buy_body):
             'quantity': product.quantity}
 
 
+@has_role(["admin"])
 def create_product_rent(product_rent_body):
     product = db.session.query(ProductRent).filter_by(name=product_rent_body['name']).first()
 
@@ -63,6 +100,7 @@ def create_product_rent(product_rent_body):
             'available': product.available}
 
 
+@has_role(["admin"])
 def edit_product_buy(product_id, product_buy_body):
     product = db.session.query(ProductBuy).filter_by(id=product_id).first()
 
@@ -89,6 +127,7 @@ def edit_product_buy(product_id, product_buy_body):
             'quantity': product.quantity}
 
 
+@has_role(["admin"])
 def edit_product_rent(product_id, product_rent_body):
     product = db.session.query(ProductRent).filter_by(id=product_id).first()
 
@@ -115,6 +154,7 @@ def edit_product_rent(product_id, product_rent_body):
             'available': product.available}
 
 
+@has_role(["admin"])
 def delete_product_buy(product_id):
     product = db.session.query(ProductBuy).filter_by(id=product_id).first()
 
@@ -134,6 +174,7 @@ def delete_product_buy(product_id):
             'quantity': product.quantity}
 
 
+@has_role(["admin"])
 def delete_product_rent(product_id):
     product = db.session.query(ProductRent).filter_by(id=product_id).first()
 
@@ -152,7 +193,7 @@ def delete_product_rent(product_id):
             'brand': product.brand,
             'available': product.available}
 
-
+@has_role(["admin"])
 def set_product_buy_discount(product_id, discount_percentage, valid_until):
     product = db.session.query(ProductBuy).filter_by(id=product_id).first()
 
@@ -169,6 +210,7 @@ def set_product_buy_discount(product_id, discount_percentage, valid_until):
             'discount_valid_until': product.discountValid}
 
 
+@has_role(["admin"])
 def set_product_rent_discount(product_id, discount_percentage, valid_until):
     product = db.session.query(ProductRent).filter_by(id=product_id).first()
 
@@ -185,6 +227,7 @@ def set_product_rent_discount(product_id, discount_percentage, valid_until):
             'discount_valid_until': product.discountValid}
 
 
+@has_role(["admin","user"])
 def get_product_buy(product_id):
     product = db.session.query(ProductBuy).filter_by(id=product_id).first()
 
@@ -201,6 +244,7 @@ def get_product_buy(product_id):
             'quantity': product.quantity}
 
 
+@has_role(["admin","user"])
 def get_product_rent(product_id):
     product = db.session.query(ProductRent).filter_by(id=product_id).first()
 
@@ -217,6 +261,7 @@ def get_product_rent(product_id):
             'available': product.available}
 
 
+@has_role(["admin","user"])
 def get_all_products_buy():
     products = db.session.query(ProductBuy).all()
     itemsList = []
@@ -234,6 +279,7 @@ def get_all_products_buy():
     return itemsList
 
 
+@has_role(["admin","user"])
 def get_all_products_rent():
     products = db.session.query(ProductRent).all()
     itemsList = []
@@ -251,6 +297,7 @@ def get_all_products_rent():
     return itemsList
 
 
+@has_role(["admin","user"])
 def search_product_buy(search_param):
     product = db.session.query(ProductBuy).filter_by(name=search_param).first()
 
@@ -267,6 +314,7 @@ def search_product_buy(search_param):
             'quantity': product.quantity}
 
 
+@has_role(["admin","user"])
 def search_product_rent(search_param):
     product = db.session.query(ProductRent).filter_by(name=search_param).first()
 
@@ -283,6 +331,7 @@ def search_product_rent(search_param):
             'available': product.available}
 
 
+@has_role(["admin","user"])
 def buy_coupon(coupon_id):
     coupon = db.session.query(Coupon).filter_by(id=coupon_id).first()
 
@@ -296,6 +345,7 @@ def buy_coupon(coupon_id):
     return {'id': coupon.id}
 
 
+@has_role(["admin","user"])
 def reserve_product_buy(reserve_product_buy_body):
     product = db.session.query(ProductBuy).filter_by(id=reserve_product_buy_body['product_id']).first()
 
@@ -316,6 +366,7 @@ def reserve_product_buy(reserve_product_buy_body):
     return {'product_id': reserved_product.product_id, 'shopping_cart_id': reserved_product.shopping_cart_id}
 
 
+@has_role(["admin","user"])
 def reserve_product_rent(reserve_product_rent_body):
     product = db.session.query(ProductRent).filter_by(id=reserve_product_rent_body['product_id']).first()
 
@@ -335,6 +386,7 @@ def reserve_product_rent(reserve_product_rent_body):
     return {'product_id': reserved_product.product_id, 'user_id': reserved_product.user_id}
 
 
+@has_role(["admin","user"])
 def buy_product(shopping_cart_id):
     reserved_products = db.session.query(ReservedProductBuy).filter_by(shopping_cart_id=shopping_cart_id).all()
 
@@ -348,6 +400,7 @@ def buy_product(shopping_cart_id):
     return items
 
 
+@has_role(["admin","user"])
 def rent_product(product_id, user_id):
     reserved_product = db.session.query(ReservedProductRent).filter_by(user_id=user_id) \
         .filter_by(product_id=product_id).first()
@@ -358,6 +411,7 @@ def rent_product(product_id, user_id):
     return {'product_id': reserved_product.product_id, 'user_id': reserved_product.user_id}
 
 
+@has_role(["admin","user"])
 def get_price_for_product_buy(product_id):
     product = db.session.query(ProductBuy).filter_by(id=product_id).first()
 
@@ -372,6 +426,7 @@ def get_price_for_product_buy(product_id):
     return {'product_name': product.name, 'product_price': product.price}
 
 
+@has_role(["admin","user"])
 def get_price_for_product_rent(product_id):
     product = db.session.query(ProductRent).filter_by(id=product_id).first()
 
@@ -386,6 +441,7 @@ def get_price_for_product_rent(product_id):
     return {'product_name': product.name, 'product_price': product.price}
 
 
+@has_role(["admin","user"])
 def get_all_product_valid_discounts():
     products_buy = db.session.query(ProductBuy).all()
     products_rent = db.session.query(ProductRent).all()
