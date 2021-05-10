@@ -1,3 +1,5 @@
+version: '3.7'
+
 services:
 
   consul:
@@ -8,7 +10,7 @@ services:
 
   inventory-api:
     build:
-      context: .
+      context: ./inventory
     image: inventory:0.0.1
     container_name: inventory-service
     ports:
