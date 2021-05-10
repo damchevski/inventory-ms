@@ -7,6 +7,7 @@ import requests
 from flask import request, abort
 from functools import wraps
 import jwt
+from consul_func import register_to_consul
 
 JWT_SECRET = "MY SECRET"
 
@@ -42,12 +43,10 @@ def has_role(arg):
 @has_role(["admin"])
 def create_coupon(coupon_body):
     coupon = Coupon(type=coupon_body['type'], quantity=coupon_body['quantity'])
-    coupon_schema = CouponSchema()
-
     db.session.add(coupon)
     db.session.commit()
 
-    return coupon_schema.dump(coupon)
+    return {'id':coupon.id, 'quantity':coupon.quantity}
 
 
 @has_role(["admin"])
@@ -471,6 +470,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///inventory.db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 connexion_app.add_api("api.yml")
+
+#register_to_consul()
 
 # dummy reference for migrations on ly
 from models.models import *
