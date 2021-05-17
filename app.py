@@ -20,13 +20,11 @@ def register_to_consul():
     consul = Consul(host="consul", port=consul_port)
     agent = consul.agent
     service = agent.service
-    ip = get_host_name_IP()
-    # print(ip)
-    check = Check.http(f"http://{ip}:{service_port}/api/ui", interval="10s", timeout="5s", deregister="1s")
-    service.register(service_name, service_id=service_name, address=ip, port=service_port, check=check)
+    check = Check.http(f"http://{service_name}:{service_port}/api/ui", interval="10s", timeout="5s", deregister="1s")
+    service.register(service_name, service_id=service_name, port=service_port, check=check)
 
 def get_consul_service(service_id):
-    consul = Consul(host="consul", port=CONSUL_PORT)
+    consul = Consul(host="consul", port=consul_port)
 
     agent = consul.agent
 
